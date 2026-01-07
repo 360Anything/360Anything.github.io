@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="360Anything" />
+        <meta name="author" content="Ziyi Wu" />
+
+        <title>360Anything</title>
+        <!-- Include Image / Video Panorama library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script src="js/image_panorama_viewer.js"></script>
+        <script src="js/video_panorama_viewer.js"></script>
+        <!-- Bootstrap core CSS -->
+        <!--link href="bootstrap.min.css" rel="stylesheet"-->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+        />
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+
+        <!-- Custom styles for this template -->
+        <link href="offcanvas.css" rel="stylesheet" />
+        <!--    <link rel="icon" href="img/favicon.gif" type="image/gif">-->
+        <style type="text/css">
+            .container {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1000px;
+                font-size: 18px;
+            }
+            .container_img {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1200px;
+                font-size: 18px;
+            }
+            .container_img_comparison {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1200px;
+                font-size: 18px;
+            }
+            .container_video_comparison {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1600px;
+                font-size: 18px;
+            }
+            .container_abs {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 800px;
+                font-size: 16px;
+            }
+            video {
+                width: 100%;
+                height: auto;
+            }
+
+            /* Custom Grid Layout for Image Panoramas */
+            .comparison-row {
+              display: flex;             /* Forces items side-by-side */
+              align-items: center;       /* Vertically centers them */
+              justify-content: center;   /* Horizontally centers content */
+              gap: 20px;                 /* Space between columns */
+              width: 100%;
+              margin-bottom: 20px;
+            }
+
+            /* Define column widths - feel free to adjust these % */
+            .col-input { width: 20%; text-align: center; }
+            .col-pano  { width: 48%; text-align: center; }
+            .col-viewer { width: 32%; text-align: center; }
+
+            /* Styling for the content */
+            .comparison-row img {
+              width: 100%;
+              border-radius: 4px;
+              display: block;
+            }
+
+            .pano-container-style {
+              width: 100%; 
+              height: 300px; /* Fixed height for the viewer */
+              border-radius: 4px; 
+              overflow: hidden; 
+              background: #000;
+              cursor: move;
+            }
+
+            /* --- 360 Video Viewer Styles --- */
+            /* Wrapper for the input video and button */
+            .video-wrapper { position: relative; width: 100%; border-radius: 8px; overflow: hidden; }
+
+            /* The Overlay */
+            .play-360-overlay {
+              position: absolute; 
+              top: 0; left: 0; 
+              width: 100%; height: 100%;
+              
+              /* POSITIONING: Top-Left */
+              display: flex;
+              justify-content: flex-start; /* Horizontal: Left */
+              align-items: flex-start;     /* Vertical: Top */
+              padding: 8px;                /* <--- Space from the edge (smaller = closer) */
+              
+              opacity: 1; 
+              pointer-events: none;        /* Let clicks pass through to video */
+            }
+            
+            .play-360-button {
+              background-color: rgba(255, 255, 255, 0.9); 
+              color: #000; 
+              border: none;
+              border-radius: 50px; 
+              
+              /* SIZE ADJUSTMENTS (Medium) */
+              padding: 8px 16px;           /* <--- Medium padding */
+              font-size: 14px;             /* <--- Medium text size */
+              
+              font-weight: bold; 
+              cursor: pointer;
+              display: flex; 
+              align-items: center; 
+              gap: 8px;                    /* Gap between icon and text */
+              pointer-events: auto;     
+              box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            /* Resize the icon inside the button */
+            .play-360-button svg {
+              width: 18px;                 /* <--- Medium icon size */
+              height: 18px;
+            }
+
+            /* MAIN MODAL CONTAINER (The dark background) */
+            .modal {
+              position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+              background-color: rgba(0, 0, 0, 0.85); /* Dark see-through background */
+              z-index: 1000;
+              /* Flexbox to center the video box */
+              display: none; /* Hidden by default */
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+            }
+
+            /* LIGHTBOX WRAPPER (Holds the video + close button together) */
+            .lightbox-wrapper {
+              position: relative; /* Anchor for the close button */
+              width: 500px;  /* <--- CHANGE WIDTH HERE */
+              height: 500px; /* <--- CHANGE HEIGHT HERE */
+              background: #000;
+              border: 2px solid #555;
+              box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            }
+
+            /* The container now just fills the wrapper */
+            #video360Container { 
+              width: 100%; 
+              height: 100%; 
+            }
+
+            /* CLOSE BUTTON (Sticks to top-right of the box) */
+            .close-btn {
+              position: absolute; 
+              top: -15px;      /* Move slightly up outside the box */
+              right: -15px;    /* Move slightly right outside the box */
+              width: 35px; height: 35px;
+              background: #333; color: white;
+              font-size: 24px; font-weight: bold;
+              border-radius: 50%; 
+              text-align: center; line-height: 35px;
+              cursor: pointer; z-index: 1002;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+              border: 2px solid white;
+            }
+            .close-btn:hover { background: #555; }
+
+            /* Controls sit below the video box now */
+            .video-controls {
+              margin-top: 25px; /* Added a bit more space since close button is nearby */
+              display: flex; gap: 10px; z-index: 1001;
+            }
+
+            .control-btn {
+              padding: 10px 20px; background: rgba(255,255,255,0.2); color: white;
+              border: 1px solid white; border-radius: 20px; cursor: pointer;
+            }
+            .control-btn:hover { background: rgba(255,255,255,0.4); }
+
+            .loader {
+              position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+              border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%;
+              width: 40px; height: 40px; animation: spin 1s linear infinite; z-index: 1001;
+            }
+            .slick-prev, .slick-next {
+                z-index: 1;
+            }
+            .slick-prev:before, .slick-next:before {
+                font-size: 30px;
+                color: black;
+                opacity: 0.8;
+            }
+            .slick-prev {
+                left: -40px;
+            }
+            .slick-next {
+                right: -40px;
+            }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+          </style>
+    </head>
+
+    <body>
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container" align="center">
+                <h2>
+                    360Anything: Geometry-Free Lifting of Images and Videos to 360°
+                </h2>
+                <h4><i>arXiv 2025</i></h4>
+                <p>
+                    <a href="https://wuziyi616.github.io/">Ziyi Wu</a><sup>2,3,*</sup>,&nbsp;
+                    <a href="https://scholar.google.ca/citations?user=ve9A9rMAAAAJ&hl=en&oi=ao">Daniel Watson</a><sup>1</sup>,&nbsp;
+                    <a href="https://theialab.ca/">Andrea Tagliasacchi</a><sup>1</sup>,&nbsp;
+                    <a href="https://www.cs.toronto.edu/~fleet/">David J. Fleet</a><sup>1</sup>,&nbsp;
+                    <a href="https://mbrubake.github.io/">Marcus A. Brubaker</a><sup>1</sup>,&nbsp;
+                    <a href="https://saxenasaurabh.github.io/">Saurabh Saxena</a><sup>1,&dagger;</sup>
+                    <br />
+                    <sup>1</sup>Google DeepMind&nbsp;&nbsp;
+                    <sup>2</sup>University of Toronto&nbsp;&nbsp;
+                    <sup>3</sup>Vector Institute&nbsp;&nbsp;
+                    <br />
+                    <sup>*</sup> Work done while interning at Google&nbsp;&nbsp;
+                    <sup>&dagger;</sup> Corresponding author
+                </p>
+                <h5>
+                    <a href="https://arxiv.org/abs/">[Paper]</a>&nbsp;
+                    <a href="more_results.html">[More Results]</a>&nbsp;
+                    <!-- <a href="https://github.com/">[Code]</a>&nbsp; -->
+                    <a href="https://x.com/">[Twitter Thread]</a>
+                </h5>
+            </div>
+        </div>
+
+        <!--------------------- Teaser Video --------------------->
+        <div class="container">
+            <h3>TL;DR: </h3>
+            <p style="font-size: 20px;">
+                360Anything lifts arbitrary perspective images and videos to seamless, gravity-aligned 360° panoramas, <strong>without using any camera or 3D information</strong>.
+                Our geometry-free DiT framework enables robust 360° novel view synthesis and 3D scene reconstruction from monocular videos.
+            </p>
+        <hr />
+        </div>
+          <div align="center"><strong><h5>
+            <span style="color: rgb(255, 0, 0);">Note: </span>Click the button to view in 360°.</strong>
+            <br />
+            <span style="color: rgb(255, 0, 0);">Red boxes</span> highlight regions corresponding to the input video.
+          </h5></div>
+          <span style="display: block; height: 5px;"></span>
+          <div style="max-width: 800px; margin: 0 auto;">
+            <div id="results-carousel" class="carousel results-carousel">
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_40_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_33_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_2_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_52_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_54_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_23_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_22_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv2_ours_25_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--------------------- Large Motion Videos --------------------->
+        <br />
+        <div class="container">
+          <div align="center"><h2>Large Motion Videos</h2></div>
+            <hr />
+            <p>
+              We test our model on challenging conditioning videos with large object or camera motion.
+              360Anything is still able to infer the camera trajectory and generate stably canonicalized 360° panoramas.
+            </p>
+          <hr />
+          <div style="max-width: 800px; margin: 0 auto;">
+            <div id="results-carousel-2" class="carousel results-carousel">
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv1_ours_45_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv2_ours_17_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv5_ours_44_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv5_ours_42_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/customv5_ours_59_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/re10k_ours_16_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/scannetpp_ours_18_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+              <div class="item video-wrapper">
+                <video controls loop muted loading="lazy" preload="metadata" style="width: 100%; display: block;">
+                  <source src="videos/video_360_viewer/scannetpp_ours_40_concat.mp4" type="video/mp4">
+                </video>
+                <div class="play-360-overlay">
+                  <button class="play-360-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polygon points="10 8 16 12 10 16"></polygon>
+                    </svg>
+                    View in 360°
+                  </button>
+                </div>
+                <div class="row text-center" style="margin-top: 10px;">
+                  <div class="col-3"><h4>Input</h4></div>
+                  <div class="col-9"><h4>Generated 360° Panorama</h4></div>
+                </div>
+              </div>
+            </div>
+          </div>
+            <p>
+              <h5>Check out more results <a href="more_results.html">here</a>.</h5>
+            </p>
+        </div>
+
+        <!--------------------- 3D Scene Reconstruction --------------------->
+        <br />
+        <div class="container">
+            <div align="center"><h2>3D Scene Reconstruction</h2></div>
+            <hr />
+            <p>
+              Given a monocular video, naively fitting a 3DGS on it leads to broken results due to the low coverage of the scene.
+              Instead, we first run 360Anything to synthesize the entire 360° view as a panorama video, and then train 3DGS on it.
+              This leads to much better geometry and enables fly-through exploration of the 3D scene.
+            </p>
+        </div>
+        <div class="container_video_comparison">
+            <hr />
+            <div align="center">
+                <h5>
+                    <table style="width: 100%; text-align: center">
+                        <thead>
+                        <tr>
+                            <th style="position: sticky; top: 0; width: 14%; background-color: #f2f2f2; padding: 10px;">Input Video</th>
+                            <th style="position: sticky; top: 0; width: 30%; background-color: #f2f2f2; padding: 10px;">Outpainted Panorama Video</th>
+                            <th style="position: sticky; top: 0; width: 28%; background-color: #f2f2f2; padding: 10px;">3DGS on Input Video</th>
+                            <th style="position: sticky; top: 0; width: 28%; background-color: #f2f2f2; padding: 10px;">3DGS on Panorama Video (<span style="color: #ff0000;">Ours</span>)</th>
+                        </tr>
+                        </thead>
+                </h5>
+                <tbody>
+                <tr>
+                    <td style="width: 14%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/input_video_11.mp4" type="video/mp4"></video></td>
+                    <td style="width: 30%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pano_video_11.mp4" type="video/mp4"></video></td>
+                    <td style="width: 28%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pers_3dgs_11.mp4" type="video/mp4"></video></td>
+                    <td style="width: 28%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pano_3dgs_11.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button></td></tr>
+                <tr>
+                    <td style="width: 14%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/input_video_17.mp4" type="video/mp4"></video></td>
+                    <td style="width: 30%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pano_video_17.mp4" type="video/mp4"></video></td>
+                    <td style="width: 28%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pers_3dgs_17.mp4" type="video/mp4"></video></td>
+                    <td style="width: 28%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pano_3dgs_17.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button></td></tr>
+                <tr>
+                    <td style="width: 14%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/input_video_29.mp4" type="video/mp4"></video></td>
+                    <td style="width: 30%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pano_video_29.mp4" type="video/mp4"></video></td>
+                    <td style="width: 28%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pers_3dgs_29.mp4" type="video/mp4"></video></td>
+                    <td style="width: 28%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/3dgs_results/pano_3dgs_29.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button></td></tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <!--------------------- Video Qualitative Comparison with Baselines --------------------->
+        <br />
+        <div class="container">
+            <div align="center"><h2>Qualitative Comparison with Video Baselines</h2></div>
+            <hr />
+            <p>
+              We show the input perspective videos, the text prompts, and the panorama videos generated by Imagine360 [1], Argus [2], ViewPoint [3], and our 360Anything.
+              <span style="color: #ff0000;">Red boxes</span> highlight the area corresponding to the input video.
+            </p>
+            <ul>
+                <li>Imagine360 and Argus produce videos with low visual quality and clear artifacts.</li>
+                <li>ViewPoint always places the input frame at the center of the output.
+                  It generates significantly rotated panoramas when inputs contain large camera motions, leading to severely distorted objects.</li>
+                <li>Our 360Anything generates high-quality canonical 360° panoramas and follows the text prompt well.</li>
+            </ul>
+        </div>
+        <div class="container_video_comparison">
+            <hr />
+            <div align="center">
+                <h5>
+                    <table style="width: 100%; text-align: center">
+                        <thead>
+                        <tr>
+                            <th style="position: sticky; top: 0; width: 11%; background-color: #f2f2f2; padding: 10px;">Input</th>
+                            <th style="position: sticky; top: 0; width: 22.25%; background-color: #f2f2f2; padding: 10px;">Imagine360</th>
+                            <th style="position: sticky; top: 0; width: 22.25%; background-color: #f2f2f2; padding: 10px;">Argus</th>
+                            <th style="position: sticky; top: 0; width: 22.25%; background-color: #f2f2f2; padding: 10px;">ViewPoint</th>
+                            <th style="position: sticky; top: 0; width: 22.25%; background-color: #f2f2f2; padding: 10px;"><strong>360Anything (<span style="color: #ff0000;">Ours</span>)</strong></th>
+                        </tr>
+                        </thead>
+                </h5>
+                <tbody>
+                <tr>
+                    <td style="width: 11%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_input_34.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_imagine360_34.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_argus_34.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_viewpoint_34.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_ours_34.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button><b>Caption:</b> A person wearing a dark shirt and a hat holds the camera and is walking down a busy city street.</td></tr>
+                <tr>
+                    <td style="width: 11%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_input_39.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_imagine360_39.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_argus_39.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_viewpoint_39.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_ours_39.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button><b>Caption:</b> Near a harbor surrounded by a village and rolling hills, an old man is actively rowing with two white oars.</td></tr>
+                <tr>
+                    <td style="width: 11%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_input_84.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_imagine360_84.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_argus_84.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_viewpoint_84.mp4" type="video/mp4"></video></td>
+                    <td style="width: 22.25%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/video_qualitative_comparison/ytb_ours_84.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button><b>Caption:</b> A man in a dark grey t-shirt gestures towards a large green tank inside a dimly lit room.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <!--------------------- 360 Image Viewer --------------------->
+        <br />
+        <div class="container">
+          <div align="center"><h2>Panorama Image Results</h2></div>
+            <hr />
+            <p>
+              360Anything also applies to perspective-to-panorama image generation.
+              We fine-tune FLUX on synthetic 360° rendering of 3D scenes, which generalizes to in-the-wild and OOD images.
+            </p>
+          <hr />
+        </div>
+        <div class="container_img_comparison">
+          <div class="comparison-row" style="font-weight: bold; font-size: 1.2em; margin-bottom: 10px;">
+            <div class="col-input">Input Image</div>
+            <div class="col-pano">Generated Panorama Image</div>
+            <div class="col-viewer">Interactive 360° Viewer</div>
+          </div>
+
+          <div id="panorama-image-carousel" class="results-carousel">
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/balloon_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/balloon_ours.png"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/lighthouse_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/lighthouse_ours.png"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/munch scream_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/munch scream_ours.png"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/starry_night_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/starry_night_ours.png"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/alice_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/alice_ours.png"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/babel_tower_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/babel_tower_ours.png"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/warehouse_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/warehouse_ours.png"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="comparison-row">
+                <div class="col-input">
+                  <img class="input-perspective-img" src="" alt="Input">
+                </div>
+                <div class="col-pano">
+                  <img src="imgs/image_360_viewer/abandoned_ours.png" alt="Panorama">
+                </div>
+                <div class="col-viewer">
+                  <div class="pano-image pano-container-style" data-image="imgs/image_360_viewer/abandoned_ours.png"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+            <p>
+              <h5>Check out more results <a href="more_results.html">here</a>.</h5>
+            </p>
+        </div>
+
+        <!--------------------- Method --------------------->
+        <br />
+        <div class="container">
+            <div align="center"><h2>Method</h2></div>
+            <hr />
+        </div>
+        <div class="container">
+            <p align="center">
+                <img src="imgs/360Anything-architecture.png" style="width: 100%"/>
+            </p>
+        </div>
+        <div class="container">
+            <p>
+              Given a perspective image or video, we aim to outpaint it to a <b>canonicalized (upright) 360° panorama</b>.
+              We simply concatenate the conditioning inputs with the noisy latents of the target panorama along the <b>sequence dimension</b>, and run a DiT for denoising.
+              The model learns to infer the camera intrinsics and extrinsics from the data without any explicit supervision.
+              We further desigh <b>Circular Latent Encoding</b> to eliminate the seam artifacts in the generated panoramas.
+            </p>
+        </div>
+
+        <!--------------------- BibTeX --------------------->
+        <br /><br />
+        <div class="container" id="bibtex">
+            <div align="center"><h2>BibTeX</h2></div>
+            <hr />
+            If you find our work useful, please consider citing our paper:
+            <pre><code>
+@article{wu360anything,
+  title={{360Anything}: Geometry-Free Lifting of Images and Videos to 360°},
+  author={Wu, Ziyi and Watson, Daniel and Tagliasacchi, Andrea and Fleet, David J. and Brubaker, Marcus A. and Saxena, Saurabh},
+  journal={arXiv},
+  year={2025}
+}</code></pre>
+        </div>
+
+        <!--------------------- References --------------------->
+        <br /><br />
+        <div class="container">
+            <div align="center"><h2>References</h2></div>
+            <hr />
+            <p>
+                [1] Tan, Jing, et al. "Imagine360: Immersive 360 Video Generation from Perspective Anchor." NeurIPS. 2025.
+                <br />
+                [2] Luo, Rundong, et al. "Beyond the Frame: Generating 360° Panoramic Videos from Perspective Videos." ICCV. 2025.
+                <br />
+                [3] Fang, Zixun, et al. "Panoramic Video Generation with Pretrained Diffusion Models." NeurIPS. 2025.
+                <br />
+                [4] Kalischek, Nikolai, et al. "CubeDiff: Repurposing Diffusion-Based Image Models for Panorama Generation." ICLR. 2025.
+                <br />
+                [5] Wan, Team, et al. "Wan: Open and Advanced Large-Scale Video Generative Models." arXiv. 2025.
+                <br />
+                [6] Black Forest Labs. "FLUX." 2024.
+            </p>
+        </div>
+
+        <!--------------------- Acknowledgement --------------------->
+        <br /><br />
+        <div class="container">
+            <div align="center"><h2>Acknowledgement</h2></div>
+            <hr />
+            <p>
+                We would like to thank Nikolai Kalischek for help with the image data and Rundong Luo for help with the video data.
+                We thank George Kopanas for help with the 3DGS experiments, Sara Sabour for discussion on 3D SfM, and Lala Li for guidance on Gemini captioning.
+                We also thank the maxdiffusion team at Google for converting FLUX and Wan from PyTorch to Jax.
+                Some testing videos are from Veo, Sora, Gen4.5, and Wan. We thank them for sharing the videos.
+            </p>
+        </div>
+
+        <br /><br /><br />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+        <script>
+        $(document).ready(function() {
+          var $videoCarousels = $('#results-carousel, #results-carousel-2');
+
+          $videoCarousels.slick({
+            dots: true,
+            arrows: true,
+            infinite: true,
+            speed: 500,
+            slidesToShow: 1,
+            adaptiveHeight: true,
+            draggable: false,  // Disables mouse dragging
+            swipe: false       // Disables touch swiping
+          });
+
+          $videoCarousels.on('afterChange', function(event, slick, currentSlide) {
+            // A. Pause ALL videos in this specific carousel
+            //    (This stops the previous video from playing in the background)
+            $(this).find('video').each(function() {
+              this.pause();
+            });
+
+            // B. Find the ACTIVE slide and play its video
+            var $activeSlide = $(this).find('.slick-current');
+            var $activeVideo = $activeSlide.find('video');
+            
+            if ($activeVideo.length > 0) {
+              // We explicitly call play()
+              $activeVideo[0].play();
+            }
+          });
+
+          // Since we removed 'autoplay', the first video won't play automatically on load.
+          // We manually trigger it here.
+          $videoCarousels.each(function() {
+            $(this).find('.slick-current video')[0].play();
+          });
+
+
+          // --- IMAGE CAROUSEL SETUP (Keep this as is) ---
+          $('#panorama-image-carousel').slick({
+            dots: true,
+            arrows: true,
+            infinite: true, 
+            speed: 500,
+            slidesToShow: 1,
+            adaptiveHeight: true,
+            draggable: false,  // Disables mouse dragging
+            swipe: false       // Disables touch swiping
+          });
+        });
+        </script>
+    </body>
+<div id="videoModal" class="modal" style="display:none;">
+  <div class="lightbox-wrapper">
+    <span id="closeModal" class="close-btn">&times;</span>
+    <div id="video360Container"></div>
+  </div>
+  
+  <div class="video-controls">
+    <button id="playPauseBtn" class="control-btn">Pause</button>
+    <button id="resetViewBtn" class="control-btn">Reset View</button>
+  </div>
+</div>
+    <script>
+  document.addEventListener('DOMContentLoaded', () => {
+  const opts = { root: null, threshold: 0.2 };          // 20 % visible
+  const io   = new IntersectionObserver(handle, opts);
+
+  document.querySelectorAll('video.lazyvid').forEach(v => {
+    v.removeAttribute('poster');
+    v.preload = 'metadata';
+    io.observe(v);                                      // start watching
+  });
+
+  function handle(entries) {
+    entries.forEach(entry => {
+      const v = entry.target;
+      if (entry.isIntersecting) {
+        hydrate(v);                                     // wire up src once
+      } else {
+        v.pause();
+        const buttonRow = v.closest('tr').nextElementSibling;
+        if (buttonRow) {
+          const button = buttonRow.querySelector('.play-all-button');
+          if (button) {
+            const icon = button.querySelector('i');
+            if (icon.classList.contains('fa-pause')) {
+              icon.classList.remove('fa-pause');
+              icon.classList.add('fa-play');
+              button.childNodes[1].nodeValue = ' Play All';
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function hydrate(v) {
+    if (v.dataset.hydrated) return;                     // run once
+    v.querySelectorAll('source').forEach(s => {
+      s.src = s.dataset.src + '#t=0.1';                            // swap data-src → src
+    });
+    v.load();                                           // kick off buffering
+    v.dataset.hydrated = true;
+  }
+
+  document.querySelectorAll('.play-all-button').forEach(button => {
+    button.addEventListener('click', (e) => {
+      const clickedButton = e.currentTarget;
+      const icon = clickedButton.querySelector('i');
+      const videoRow = clickedButton.closest('tr').previousElementSibling;
+      if (videoRow) {
+        if (icon.classList.contains('fa-play')) {
+          videoRow.querySelectorAll('video.lazyvid').forEach(v => {
+            hydrate(v);
+            v.currentTime = 0.1;
+            v.play().catch(()=>{});
+          });
+          icon.classList.remove('fa-play');
+          icon.classList.add('fa-pause');
+          clickedButton.childNodes[1].nodeValue = ' Pause All';
+        } else {
+          videoRow.querySelectorAll('video.lazyvid').forEach(v => {
+            v.pause();
+            v.currentTime = 0.1;
+          });
+          icon.classList.remove('fa-pause');
+          icon.classList.add('fa-play');
+          clickedButton.childNodes[1].nodeValue = ' Play All';
+        }
+      }
+    });
+  });
+});
+    </script>
+</html>
