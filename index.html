@@ -139,8 +139,8 @@
               border-radius: 50px; 
               
               /* SIZE ADJUSTMENTS (Medium) */
-              padding: 8px 16px;           /* <--- Medium padding */
-              font-size: 14px;             /* <--- Medium text size */
+              padding: 8px 8px;           /* <--- Medium padding */
+              font-size: 18px;             /* <--- Medium text size */
               
               font-weight: bold; 
               cursor: pointer;
@@ -153,8 +153,8 @@
 
             /* Resize the icon inside the button */
             .play-360-button svg {
-              width: 18px;                 /* <--- Medium icon size */
-              height: 18px;
+              width: 24px;                 /* <--- Medium icon size */
+              height: 24px;
             }
 
             /* MAIN MODAL CONTAINER (The dark background) */
@@ -242,7 +242,7 @@
                 <h2>
                     360Anything: Geometry-Free Lifting of Images and Videos to 360°
                 </h2>
-                <h4><i>arXiv 2025</i></h4>
+                <h4><i>arXiv 2026</i></h4>
                 <p>
                     <a href="https://wuziyi616.github.io/">Ziyi Wu</a><sup>2,3,*</sup>,&nbsp;
                     <a href="https://scholar.google.ca/citations?user=ve9A9rMAAAAJ&hl=en&oi=ao">Daniel Watson</a><sup>1</sup>,&nbsp;
@@ -434,12 +434,15 @@
 
         <!--------------------- Large Motion Videos --------------------->
         <br />
-        <div class="container">
+        <div class="container" id="large-motion-video">
           <div align="center"><h2>Large Motion Videos</h2></div>
             <hr />
             <p>
               We test our model on challenging conditioning videos with large object or camera motion.
               360Anything is still able to infer the camera trajectory and generate stably canonicalized 360° panoramas.
+            </p>
+            <p>
+              <h5>Check out more results <a href="more_results.html#more-large-motion-video">here</a>.</h5>
             </p>
           <hr />
           <div style="max-width: 800px; margin: 0 auto;">
@@ -590,20 +593,20 @@
               </div>
             </div>
           </div>
-            <p>
-              <h5>Check out more results <a href="more_results.html">here</a>.</h5>
-            </p>
         </div>
 
         <!--------------------- 3D Scene Reconstruction --------------------->
         <br />
-        <div class="container">
+        <div class="container" id="3d-scene-recon">
             <div align="center"><h2>3D Scene Reconstruction</h2></div>
             <hr />
             <p>
               Given a monocular video, naively fitting a 3DGS on it leads to broken results due to the low coverage of the scene.
               Instead, we first run 360Anything to synthesize the entire 360° view as a panorama video, and then train 3DGS on it.
               This leads to much better geometry and enables fly-through exploration of the 3D scene.
+            </p>
+            <p>
+              <h5>Check out more results <a href="more_results.html#more-3d-scene-recon">here</a>.</h5>
             </p>
         </div>
         <div class="container_video_comparison">
@@ -649,7 +652,7 @@
 
         <!--------------------- Video Qualitative Comparison with Baselines --------------------->
         <br />
-        <div class="container">
+        <div class="container" id="compare-with-baseline">
             <div align="center"><h2>Qualitative Comparison with Video Baselines</h2></div>
             <hr />
             <p>
@@ -662,6 +665,9 @@
                   It generates significantly rotated panoramas when inputs contain large camera motions, leading to severely distorted objects.</li>
                 <li>Our 360Anything generates high-quality canonical 360° panoramas and follows the text prompt well.</li>
             </ul>
+            <p>
+              <h5>Check out more results <a href="more_results.html#more-compare-with-baseline">here</a>.</h5>
+            </p>
         </div>
         <div class="container_video_comparison">
             <hr />
@@ -710,12 +716,15 @@
 
         <!--------------------- 360 Image Viewer --------------------->
         <br />
-        <div class="container">
+        <div class="container" id="360-image-result">
           <div align="center"><h2>Panorama Image Results</h2></div>
             <hr />
             <p>
               360Anything also applies to perspective-to-panorama image generation.
               We fine-tune FLUX on synthetic 360° rendering of 3D scenes, which generalizes to in-the-wild and OOD images.
+            </p>
+            <p>
+              <h5>Check out more results <a href="more_results.html#more-360-image-result">here</a>.</h5>
             </p>
           <hr />
         </div>
