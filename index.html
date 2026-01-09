@@ -264,6 +264,8 @@
                     <!-- <a href="https://github.com/">[Code]</a>&nbsp; -->
                     <a href="https://x.com/">[Twitter Thread]</a>
                 </h5>
+                <br />
+                <h4><span style="color: rgb(255, 0, 0);">Please use Chrome for full compatibility</span></h4>
             </div>
         </div>
 
@@ -1059,5 +1061,21 @@
     });
   });
 });
+function adjustAnchor() {
+    if (window.location.hash) {
+      const element = document.querySelector(window.location.hash);
+      if (element) {
+        // A small delay (300-500ms) is usually needed to let 
+        // the carousel finish "collapsing"
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'auto' }); 
+          // Use 'auto' for an instant snap, 'smooth' for a slide
+        }, 500);
+      }
+    }
+  }
+
+  // Run when everything (videos/scripts) is fully loaded
+  window.addEventListener('load', adjustAnchor);
     </script>
 </html>
