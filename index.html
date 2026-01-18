@@ -870,10 +870,55 @@
             <p>
               Given a raw 360° video with arbitrary camera orientations, we first follow a two-step canonicalization pipeline to make it a <b>gravity-aligned (upright) 360° video</b>.
               To train on such canonicalized data, we project the panorama video to perspective views with randomly sampled camera trajectories as model conditioning.
-              We simply concatenate the conditioning inputs with the noisy latents of the target panorama along the <b>sequence dimension</b>, and run a DiT for denoising.
+              We simply concatenate the conditioning tokens (<span style="color: #E69933;"><b>orange</b></span>) with the noisy latents of the target panorama (<span style="color: #32B332;"><b>green</b></span>) along the <b>sequence dimension</b>, and run a DiT for denoising.
               The model learns to infer the camera intrinsics and extrinsics from the data without any explicit supervision.
               We further desigh <b>Circular Latent Encoding</b> to eliminate the seam artifacts in the generated panoramas.
             </p>
+        </div>
+
+        <br />
+        <div class="container" id="video-canonicalization">
+            <div align="center"><h3>Video Canonicalization Pipeline</h3></div>
+            <hr />
+            <p>
+              Since we do not provide explicit camera poses, the model can "place" the perspective input anywhere on the 360° canvas.
+              We thus enforce the model to always generate panoramas in a <b>gravity-aligned upright orientation</b>, regardless of the camera pose of the perspective input.
+              This requires canonicalizing all training panoramas, involving two steps:
+            </p>
+            <ol>
+                <li>Estimate per-frame camera pose, then rotate all frames to align with the first frame. This stabilizes the video by eliminating inter-frame rotation, e.g., a shaking camera held by a walking person.</li>
+                <li>Estimate the gravity direction of the video, then rotate the video to align the gravity direction with the vertical axis. This ensures the horizon is a straight line parallel to the image boundary.</li>
+            </ol>
+        </div>
+        <div class="container_img_comparison">
+            <hr />
+            <div align="center">
+                <h5>
+                    <table style="width: 100%; text-align: center">
+                        <thead>
+                        <tr>
+                            <th style="position: sticky; top: 0; width: 33%; background-color: #f2f2f2; padding: 10px;">Raw</th>
+                            <th style="position: sticky; top: 0; width: 33%; background-color: #f2f2f2; padding: 10px;">Stabilized</th>
+                            <th style="position: sticky; top: 0; width: 33%; background-color: #f2f2f2; padding: 10px;"><strong>Canonicalized (<span style="color: #ff0000;">Ours</span>)</strong></th>
+                        </tr>
+                        </thead>
+                </h5>
+                <tbody>
+                <tr>
+                    <td style="width: 33%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/canonicalization/1_raw.mp4" type="video/mp4"></video></td>
+                    <td style="width: 33%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/canonicalization/1_stabilized.mp4" type="video/mp4"></video></td>
+                    <td style="width: 33%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/canonicalization/1_canonicalized.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button></td></tr>
+                <tr>
+                    <td style="width: 33%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/canonicalization/0_raw.mp4" type="video/mp4"></video></td>
+                    <td style="width: 33%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/canonicalization/0_stabilized.mp4" type="video/mp4"></video></td>
+                    <td style="width: 33%; padding: 0 0.5%;"><video class="lazyvid" width="100%" playsinline muted controls loop preload="none" poster="thumb.jpg"><source data-src="videos/canonicalization/0_canonicalized.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr><td colspan="5" style="padding: 5px 0.5% 15px 0.5%; font-size: 18px; border-top: none; text-align: left;"><button class="play-all-button btn btn-secondary btn-sm" style="margin-right: 10px;"><i class="fas fa-play mr-1"></i> Play All</button></td></tr>
+                </tbody>
+            </table>
+            </div>
         </div>
 
         <!--------------------- BibTeX --------------------->
