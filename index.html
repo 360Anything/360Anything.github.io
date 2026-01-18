@@ -46,7 +46,7 @@
                 margin-right: auto;
                 vertical-align: middle;
                 width: 100%;
-                max-width: 1200px;
+                max-width: 1000px;
                 font-size: 18px;
             }
             .container_img_comparison {
@@ -861,14 +861,15 @@
             <div align="center"><h2>Method</h2></div>
             <hr />
         </div>
-        <div class="container">
+        <div class="container_img">
             <p align="center">
                 <img src="imgs/360Anything-architecture.png" style="width: 100%"/>
             </p>
         </div>
         <div class="container">
             <p>
-              Given a perspective image or video, we aim to outpaint it to a <b>canonicalized (upright) 360° panorama</b>.
+              Given a raw 360° video with arbitrary camera orientations, we first follow a two-step canonicalization pipeline to make it a <b>gravity-aligned (upright) 360° video</b>.
+              To train on such canonicalized data, we project the panorama video to perspective views with randomly sampled camera trajectories as model conditioning.
               We simply concatenate the conditioning inputs with the noisy latents of the target panorama along the <b>sequence dimension</b>, and run a DiT for denoising.
               The model learns to infer the camera intrinsics and extrinsics from the data without any explicit supervision.
               We further desigh <b>Circular Latent Encoding</b> to eliminate the seam artifacts in the generated panoramas.
@@ -886,7 +887,7 @@
   title={{360Anything}: Geometry-Free Lifting of Images and Videos to 360°},
   author={Wu, Ziyi and Watson, Daniel and Tagliasacchi, Andrea and Fleet, David J. and Brubaker, Marcus A. and Saxena, Saurabh},
   journal={arXiv},
-  year={2025}
+  year={2026}
 }</code></pre>
         </div>
 
