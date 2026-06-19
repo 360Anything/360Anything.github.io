@@ -1,0 +1,30 @@
+## Task
+Generate a detailed single paragraph caption for the following sequence of video frames.
+
+## Context
+The frames are sampled at 1 FPS from a 360-degree panoramic video. The caption you generate will be used as the input prompt to a text-to-video model.
+
+## Rules
+1. **Describe the Scene Objectively:** Detail the main subjects (people, objects, animals), their key attributes (colors, clothing, textures), and any actions occurring. Only include visual elements of the scene so do not include sounds or smells.
+2. **Use Only Relative Positions:** Since the scene is a continuous, spherical space, it does not have the concept of "left" or "right" compared to a perspective image. Thus, for horizontal positions, only describe relative relationships between objects (e.g., "a person stands near a tree"). For vertical positions, you can describe them as usual like "above" or "below".
+3. **Acknowledge 360° Continuity:** Since the scene is a continuous loop, the left and right side of the image are connected. An object that appears partially on both the far left and far right of the image is a single, complete object. Do not describe it as two objects. Instead, describe it as a single object. To give you a few examples:
+  - If you see two **partial** persons in the image, one on the left and one on the right, they are a single person. Do not describe them as two separate persons. Just describe them as a single person by merging the attributes of the two partial persons to one person.
+  - If you see two **partial** cars in the image, one on the left and one on the right, they are a single car. If there is also a person at the center of the image, do not say "the person is between two cars" -- just describe the car and the person separately.
+  - If you see two **complete** cars in the image, one on the left and one on the right, they are two separate cars.
+4. **Start with a Panoramic Statement:** Begin the caption with a phrase like "A 360-degree view of..." or "Panoramic shot of...".
+5. **Describe Visible Border Artifacts:** If the top or bottom of the frame contains artifacts like black borders, a tripod, or a hand holding the camera, describe them factually. Keep this description short.
+
+## Negative Constraints
+1. **NO ABSOLUTE HORIZONTAL POSITIONS:** Strictly avoid words like "left", "right", "center", and "clockwise".
+2. **NO MENTION OF EDGES OR SPLITS:** While an object split to the left and right side of the image is a single object, please just treat it as a single object and avoid phrases like "at the edge of the frame", "split across the image", or "wraps around".
+3. **NO Distortion Descriptions:** The frames are from an equirectangular projection. Ignore any curved lines or distortion and describe objects as they would appear in reality. Do not use words like "curved", "distorted", or "warped".
+4. **NO Prefixes:** Do not start the caption with "The video shows..." or "In this video...".
+
+Here are some examples:
+1. A panoramic view of a tranquil beach during a vibrant sunset. The sky overhead is a smooth gradient of deep orange, pink, and purple, reflecting softly on the wet sand. Gentle ocean waves with white foam lap against the wet, sandy shore. The sand is a light tan color, dotted with a few small, scattered seashells. Several seagulls fly in the sky above the water.
+2. A 360-degree view of a crowded outdoor street market on a bright, sunny day. A dense crowd of people moves between vendor stalls that are packed with colorful produce, including red apples and yellow bananas. One vendor, wearing a blue apron, stands near his stall arranging vegetables. Above, colorful tarps are stretched between buildings, with a slice of clear blue sky visible.
+3. A 360-degree view from a hiking trail surrounded by a dense, sun-dappled forest. A person wearing a large red backpack and a gray bucket hat is hiking on the narrow dirt path. Tall green trees with rough, brown trunks and vibrant foliage form a canopy overhead, with small patches of bright blue sky peeking through. The ground is covered in a layer of dry, brown leaves. At the very bottom of the view, the blurred fingers of a hand holding the camera are visible.
+Please keep the number of words similar to these examples.
+
+Now, caption this video:
+{{frame_0}} {{frame_1}} {{frame_2}} {{frame_3}} {{frame_4}} {{frame_5}} {{frame_6}} {{frame_7}} {{frame_8}} {{frame_9}}

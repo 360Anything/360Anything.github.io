@@ -1,0 +1,29 @@
+## Task
+Generate a detailed single paragraph caption for the following 360-degree panoramic image.
+
+## Context
+The caption you generate will be used as the input prompt to a text-to-image model.
+
+## Rules
+1. **Describe the Scene Objectively:** Detail the main subjects (people, objects, furnitures) and their key attributes (colors, clothing, textures). Only include visual elements of the scene; do not include sounds or smells.
+2. **Use Only Relative Positions:** Since the scene is a continuous, spherical space, it does not have the concept of "left" or "right" compared to a perspective image. Thus, for horizontal positions, only describe relative relationships between objects (e.g., "a person stands near a tree"). For vertical positions, you can describe them as usual like "above" or "below".
+3. **Acknowledge 360° Continuity:** Since the scene is a continuous loop, the left and right side of the image are connected. An object that appears partially on both the far left and far right of the image is a single, complete object. Do not describe it as two objects. Instead, describe it as a single object. To give you a few examples:
+  - If you see two **partial** persons in the image, one on the left and one on the right, they are a single person. Do not describe them as two separate persons. Just describe them as a single person by merging the attributes of the two partial persons to one person.
+  - If you see two **partial** cars in the image, one on the left and one on the right, they are a single car. If there is also a person at the center of the image, do not say "the person is between two cars" -- just describe the car and the person separately.
+  - If you see two **complete** cars in the image, one on the left and one on the right, they are two separate cars.
+4. **Start with a Panoramic Statement:** Begin the caption with a phrase like "A 360-degree view of..." or "Panoramic shot of...".
+
+## Negative Constraints
+1. **NO ABSOLUTE HORIZONTAL POSITIONS:** Strictly avoid words like "left", "right", "center", and "clockwise".
+2. **NO MENTION OF EDGES OR SPLITS:** While an object split to the left and right side of the image is a single object, please just treat it as a single object and avoid phrases like "at the edge of the image", "split across the image", or "wraps around".
+3. **NO Distortion Descriptions:** The image is from an equirectangular projection. Ignore any curved lines or distortion and describe objects as they would appear in reality. Do not use words like "curved", "distorted", or "warped".
+4. **NO Prefixes:** Do not start the caption with "The picture shows..." or "In this image...".
+
+Here are some examples:
+1. A 360-degree view of a cramped, clinical bathroom with muted grayish-beige tiles. There is a white toilet, and a narrow window high on the wall shows a smoky, gray-purple city skyline at twilight with orange streetlights. A worn, dark-wood door with a cracked, off-white lintel leads to a hallway. A wobbly shelf holds faded white towels and toiletries.
+2. A panoramic view of a long, dimly lit hallway with chipped, faded paint leads to a cozy living room. Two heavy oak doors with brass handles stand at the end of the passage, one mahogany and the other ashy gray. In the living room, a plush, worn-leather sofa sits next to a large, flat-screen television mounted on a warm, honeyed beige wall. A balcony with a light, faded floral tapestry is visible beyond the sofa.
+3. Panoramic shot of a modern kitchen with white Shaker-style cabinets. There is a polished marble countertops, a stainless steel refrigerator, a gas cooktop with a stainless steel hood, and a built-in dishwasher. A large window reveals a bustling city skyline with skyscrapers piercing the sky. The dining area has a massive, round oak table and grey linen chairs.
+Please keep the number of words similar to these examples.
+
+Now, caption this image:
+{{equi}}

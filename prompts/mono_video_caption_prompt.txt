@@ -1,0 +1,27 @@
+## Task
+Generate a detailed single paragraph caption for the following sequence of video frames.
+
+## Context
+The frames are sampled at 1 FPS from a **perspective (monocular) video**, showing only a **partial view** of a 3D scene. Your task is to **infer the most likely complete 360-degree environment** that contains these views. The caption you generate will be input to a text-to-video model to generate a **full panoramic video**. Therefore, your caption must describe a complete 360-degree scene, not just the limited view shown in the frames.
+
+## Rules
+1. **Describe Visible Content Objectively:** Detail the main subjects (people, objects, animals), their key attributes (colors, clothing, textures), and any actions in the input frames. Only include visual elements of the scene so do not include sounds or smells.
+2. **Infer the Static Environment:** To complete the 360-degree scene, add plausible **static, environmental** elements that are "off-camera" (e.g., if you see a mountain, you can infer the trees; if you see a bed in a bedroom, you can infer a door at the back). Crucially, do not add new dynamic actors (e.g., people, cars) that are not present in the input frames.
+3. **Use Only Relative Positions:** Your **output caption** must describe a 360-degree space. Therefore, for horizontal positions, only describe relative relationships between objects (e.g., "a chair is next to a bed"). You can use vertical positions as usual (e.g., "above", "below").
+4. **Start with a Panoramic Statement:** Begin the caption with a phrase like "A 360-degree view of...".
+
+## Negative Constraints
+1. **NO ABSOLUTE HORIZONTAL POSITIONS:** Strictly avoid words like "left", "right", "center", and "clockwise".
+2. **NO NEW DYNAMIC OBJECTS:** Do not invent new dynamic objects that are not observed in the input frames.
+3. **NO CAMERA MOTION:** Do not describe the *input video's* camera motion. Do not use words like "panning", "tilting", "moving".
+4. **NO MENTION OF CAMERA:** Do not describe the camera, tripod, or a hand holding the camera, even if it is visible in the frames.
+5. **NO Prefixes:** Do not start the caption with "The video shows..." or "In this video...".
+
+Here are some examples:
+1. A 360-degree view of an ancient Egyptian temple complex bathed in bright sunlight under a clear blue sky. The grand entrance features two massive, light reddish-brown stone pylons, intricately carved, flanked by a tall obelisk and several large, light gray stone statues, including two prominent seated figures. The foreground consists of light-colored paved stone blocks transitioning to sandy ground, where long, distinct shadows from the temple structures and distant palm trees stretch across the scene, indicating a low sun angle. A strong sun glare is visible above the temple, with other smaller structures and green palm trees appearing in the distance.
+2. A 360-degree view of a bustling indoor market featuring a high, arched corrugated metal roof supported by wooden beams and blue metal pipes. A child in an orange t-shirt and a light blue face mask is walking, carrying a plastic bag. Numerous market stalls, many covered with blue and white striped tarps, line the aisles, displaying various goods under fluorescent lighting, with bright daylight visible at the market's far end.
+3. A 360-degree view of a bustling city street on a clear, sunny winter day, with patches of snow and slush covering the pavement and sidewalks. A large, sunlit stone building with many windows stands prominently, flanked by bare trees, while modern glass skyscrapers and a distant church spire complete the urban landscape. Traffic lights display various colors, and street signs are visible, alongside several vehicles including white cars and a truck on the road.
+Please keep the number of words similar to these examples.
+
+Now, caption this video:
+{{frame_0}} {{frame_1}} {{frame_2}} {{frame_3}} {{frame_4}}
